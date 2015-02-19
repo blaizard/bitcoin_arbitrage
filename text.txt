@@ -1,0 +1,16 @@
+Bot Id: 1
+`BTC-e' Total execution time: 16.0ms (min:0.0ms; max:47.0ms)
+`BTC-e' Pair update execution time: 0.0ms (min:0.0ms; max:31.0ms)
+`BTC-e' Algorithm `triangularArbitrage' execution time: 16.0ms (min:0.0ms; max:31.0ms)
+Active Orders: None
+`BTC-e' at t=1423690288 - Estimated value 92.580733 USD (-0.00%)
+PPC:	0.000000
+USD:	71.702455
+BTC:	0.000759
+LTC:	0.000006
+NVC:	14.071800
+NMC:	9.299114
+GBP:	0.000000
+RUR:	443.079547
+CNH:	0.000000
+EUR:	2.726995
