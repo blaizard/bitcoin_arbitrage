@@ -4,6 +4,7 @@
 from utilz.log import *
 from exchanges.exchange import *
 from exchanges.currency import *
+from exchanges.orderUtilz import *
 
 import sys
 import time
@@ -72,15 +73,13 @@ class Bot(object):
 		for ex in self.config['exchanges']:
 			ex.setBalance(self.config['simulationData']['balance'])
 
+		# Initialize the exchanges
 		self.context = []
 		for ex in self.config['exchanges']:
 			exchange = {
 				'exchange': ex,
 				'algorithms': []
 			}
-			for algorithm in self.config['algorithms']:
-				UtilzLog.info("Initializing `%s' for `%s'" % (algorithm.__name__, ex.getName()), 1)
-				exchange['algorithms'].append(algorithm(ex))
 			self.context.append(exchange)
 
 		UtilzLog.info("Convert currency trading amounts", 1)
@@ -91,7 +90,9 @@ class Bot(object):
 			# Update the rates
 			ex['exchange'].updatePairs()
 			# Generate the order list to pass from 1 currency to the base currency
-			ex['orderBaseCurrency'] = self.identifyRates(ex['exchange'], baseCurrency)
+			ex['orderBaseCurrency'] = OrderUtilz.identifyCurrencyRates(ex['exchange'], baseCurrency)
+			#ex['orderBaseCurrency'] = self.identifyRates(ex['exchange'], baseCurrency)
+
 			# Merge with the average rates
 			orderAverageRates.update(ex['orderBaseCurrency'])
 			# Make the currency list
@@ -131,74 +132,17 @@ class Bot(object):
 			# Update the balance
 			ex['exchange'].updateBalance()
 			# Estimates the value
-			value = self.estimateValue(ex)
+			value = OrderUtilz.estimateValue(ex['exchange'].getTotalBalance(), ex['orderBaseCurrency'])
 			# Store the initial value of the balance
 			ex['initialValue'] = value
 			stringList.append("`%s': %f %s" % (ex['exchange'].getName(), value, self.config['trade']['currency']))
 		UtilzLog.info(", ".join(stringList), 1)
 
-	def identifyRates(self, exchange, currency):
-		"""
-		Identify all the rates of the currencies of this exchange market from a base currency
-		"""
-		def identify(exchange, c, currency, ignoreCurrencies = [], rate = 1.):
-			# If the current currency is the same as c
-			if currency == c:
-				return None
-			pairList = exchange.getPair(c)
-			# If the pair to the currency exists
-			if pairList.has_key(currency):
-				return pairList[currency].orderSell()
-			# If a direct pair does not exists
-			for c2 in pairList:
-				# Ignore some currencies
-				if c2 in ignoreCurrencies:
-					continue
-				# Call the recursive function
-				result = identify(exchange, c2, currency, ignoreCurrencies + [c], rate)
-				if result != None:
-					order = pairList[c2].orderSell()
-					order.addChainOrder(result)
-					return order
-			# Nothing has been found
-			return None
-
-		# Compute the rates
-		rates = {}
-		for c in exchange.currencyList():
-			rates[c] = identify(exchange, c, currency)
-			# Update the rates
-			if rates[c]:
-				rates[c].update()
-
-		return rates
-
-	def estimateValue(self, exchange = None):
-		"""
-		Estimates the total value in a particular exchange place.
-		If exchange is not set estimates the value in all exchange places.
-		"""
-		# Build the exchange list
-		if exchange == None:
-			exchangeList = [ex['exchange'] for ex in self.context]
-		else:
-			exchangeList = [exchange]
-		# Total value
-		value = 0.
-		for ex in exchangeList:
-			# Read the total balance of this exchange
-			balance = ex['exchange'].getTotalBalance()
-			for currency in balance:
-				# Continue only if there is money in the balance
-				if balance[currency] <= 0:
-					continue
-				order = ex['orderBaseCurrency'][currency]
-				if order != None:
-					# Update the rates and estimate the value
-					value = value + order.updateChain().estimateChain(balance[currency])
-				else:
-					value = value + balance[currency]
-		return value
+		# Initialize the various algorithms
+		for exchange in self.context:
+			for algorithm in self.config['algorithms']:
+				UtilzLog.info("Initializing `%s' for `%s'" % (algorithm.__name__, exchange['exchange'].getName()), 1)
+				exchange['algorithms'].append(algorithm(exchange['exchange']))
 
 	def printBalance(self):
 		"""
@@ -206,7 +150,7 @@ class Bot(object):
 		"""
 		string = ""
 		for ex in self.context:
-			value = self.estimateValue(ex)
+			value = OrderUtilz.estimateValue(ex['exchange'].getTotalBalance(), ex['orderBaseCurrency'])
 			# Estimated balance
 			stringBalance = "%f %s" % (value, self.config['trade']['currency'])
 			# Progress only if the initial balance is greater than 0

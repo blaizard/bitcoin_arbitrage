@@ -4,12 +4,12 @@
 from exchanges.port.btce import *
 from exchanges.currency import *
 from exchanges.transaction import *
+from exchanges.orderUtilz import *
 from utilz.data import UtilzData
 from utilz.log import *
 from utilz.object import *
 from strategies.triangularArbitrage import *
 from strategies.stableCurrency import *
-from strategies.weakPair import *
 from bot import *
 from privateConfig import *
 
@@ -113,8 +113,7 @@ if __name__ == "__main__":
 
 	b = Bot({
 		'exchanges': [btce],
-	#	'algorithms': [weakPair, triangularArbitrage, stableCurrency]
-		'algorithms': [triangularArbitrage],
+		'algorithms': [triangularArbitrage, stableCurrency],
 		'debug': True
 	})
 	b.run()
