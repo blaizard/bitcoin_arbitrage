@@ -11,6 +11,7 @@ from strategies.triangularArbitrage import *
 from strategies.stableCurrency import *
 from strategies.weakPair import *
 from bot import *
+from privateConfig import *
 
 import time
 
@@ -105,8 +106,8 @@ if __name__ == "__main__":
 	#config = {'recordWrite': ("records/%s-%s-btce.txt" % (time.strftime("%Y.%m.%d"), time.strftime("%H.%M.%S")))}
 	#config = {'recordRead': "records/2015.02.03-10.40.02-btce.txt"}
 	config = {}
-	config['apiKey'] = "34UGXSQD-UEGIFE5Q-TOCSA3LO-CGXLZBQO-NT3YTL9X"
-	config['apiSecret'] = "b79fbc82b00d1f597fe7703a896ac50b3276e3335c6ca63fbb130672acaef75a"
+	config['apiKey'] = BTCE_APIKEY
+	config['apiSecret'] = BTCE_APISECRET
 
 	btce = ExchangeBTCE(config)
 

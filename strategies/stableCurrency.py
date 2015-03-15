@@ -34,4 +34,3 @@ class stableCurrency(object):
 		# If this currency is on the volatile currency list
 		if currency in Currency.volatile():
 			pass
-
