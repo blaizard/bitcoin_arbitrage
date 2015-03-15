@@ -259,16 +259,20 @@ class Bot(object):
 			except:
 				UtilzLog.display("Error while fetching the balance")
 
-			# Print info about the bot
-			m, s = divmod(time.time() - self.initTimestamp, 60)
-			h, m = divmod(m, 60)
-			string = "Bot Id: %i (%d:%02d:%02d)\n" % (self.identifier, h, m, s)
-			# Print the execution time
-			string = string + self.printTimings()
-			# Print the balance
-			string = string + self.printBalance()
-			# Print the actie orders
-			string = string + self.printOrders()
+			# Guards if the display has an issue due to some concurent data access
+			try:
+				# Print info about the bot
+				m, s = divmod(time.time() - self.initTimestamp, 60)
+				h, m = divmod(m, 60)
+				string = "Bot Id: %i (%d:%02d:%02d)\n" % (self.identifier, h, m, s)
+				# Print the execution time
+				string = string + self.printTimings()
+				# Print the balance
+				string = string + self.printBalance()
+				# Print the actie orders
+				string = string + self.printOrders()
+			except:
+				UtilzLog.display("Error while printing the display")
 
 			# Print the displayed info
 			UtilzLog.display(string)

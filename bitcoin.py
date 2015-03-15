@@ -87,7 +87,6 @@ def testExchange(exchange):
 		# Look at the active order list
 		exchange.updateOrdersPort()
 
-
 if __name__ == "__main__":
 
 	# Set the proxy if needed

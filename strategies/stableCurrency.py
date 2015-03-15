@@ -11,8 +11,10 @@ class stableCurrency(object):
 	"""
 	This algorithm implements a back to stable currency strategy.
 	If there a positive balance in a non-stable currency, and no order pending,
-	it will try to bring back the balance to a stable currency.
+	it will try to bring back all the balance to this stable currency.
 	"""
+
+	GAIN_THRESHOLD_PERCENT = 0.5
 
 	def __init__(self, exchange):
 		# Save the exchange for future use

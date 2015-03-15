@@ -113,7 +113,7 @@ class ExchangeBTCE(Exchange):
 			self.updateBalancePort()
 
 	def syncNonce(self):
-		self.btceAPI("getInfo")
+		self.btceAPI("getInfo", retry = False)
 
 	def updateBalancePort(self, info = None):
 		"""
@@ -156,7 +156,7 @@ class ExchangeBTCE(Exchange):
 		# Update the balance
 		self.setBalance(balance)
 
-	def btceAPI(self, method, args = {}):
+	def btceAPI(self, method, args = {}, retry = True):
 		"""
 		Generic function to get info from the private API
 		"""
@@ -216,7 +216,12 @@ class ExchangeBTCE(Exchange):
 			m = re.match(".*you should send:([0-9]+).*", message)
 			if m:
 				self.nonce = int(m.group(1))
-				UtilzLog.info("`%s' Adjusting nonce to `%i'." % (self.getName(), self.nonce), 1)
+				if retry:
+					UtilzLog.info("`%s' Adjusting nonce to `%i' and retrying command `%s'" % (self.getName(), self.nonce, method), 1)
+					# Retry with the new nonce
+					return self.btceAPI(method, args)
+				else:
+					UtilzLog.info("`%s' Adjusting nonce to `%i'" % (self.getName(), self.nonce), 1)
 
 			return [False, message]
 

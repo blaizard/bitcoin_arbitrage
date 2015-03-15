@@ -55,7 +55,9 @@ class UtilzLog(object):
 		UtilzLog.setHandler(logging.StreamHandler(stream = sys.stdout))
 
 		UtilzLog.setVerbosity(level)
-		UtilzLog.setHook(None, None)
+		# Clean up the hooks
+		UtilzLog.hooks = {}
+
 		# Clean up the preset list
 		UtilzLog.presets = {}
 		# Add the presets
@@ -90,10 +92,10 @@ class UtilzLog(object):
 		setattr(UtilzLog, "verboseLevel", int(level))
 
 	@staticmethod
-	def setHook(fct, args = None):
-		# Trick to avoid a cast
-		setattr(UtilzLog, "hookFct", [fct])
-		setattr(UtilzLog, "hookArgs", args)
+	def setHook(preset, fct, args = None):
+		# Store the function pointer
+		UtilzLog.hooks[preset] = [fct, args]
+		setattr(UtilzLog, "hooks", UtilzLog.hooks)
 
 	@staticmethod
 	def setFile(filename):
@@ -127,9 +129,9 @@ class UtilzLog(object):
 			raise error("Unknown preset `%s'." % (str(preset)))
 
 		# If a hook is defined
-		hookFct = UtilzLog.hookFct
-		if hookFct and hookFct[0]:
-			message = hookFct[0](preset, str(message), UtilzLog.hookArgs)
+		hooks = UtilzLog.hooks
+		if hooks.has_key(preset):
+			message = hooks[preset][0](preset, str(message), hooks[preset][1])
 
 		# Wrap the message with the color
 		message = colorWrap % (str(message))
