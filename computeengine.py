@@ -27,7 +27,7 @@ if __name__ == "__main__":
 	Exchange.disableSimulationMode()
 
 	# Set the log hook
-	UtilzLog.setHook(hookLog)
+	UtilzLog.setHook("display", hookLog)
 
 	config = {}
 	config['apiKey'] = BTCE_APIKEY
