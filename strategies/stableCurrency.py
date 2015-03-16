@@ -44,7 +44,7 @@ class stableCurrency(object):
 		for currency in self.STABLE_CURRENCY_LIST:
 			for c in self.currencyRates[currency]:
 				# Ignore if None
-				if self.currencyRates[currency][c] == None:
+				if not self.currencyRates[currency].has_key(c) or self.currencyRates[currency][c] == None:
 					continue
 				# Update the rates of the orders
 				self.currencyRates[currency][c].updateChain()
@@ -69,7 +69,7 @@ class stableCurrency(object):
 				# Only update the currencies available
 				for c in balance:
 					# Ignore if None
-					if self.currencyRates[currency][c] == None:
+					if not self.currencyRates[currency].has_key(c) or self.currencyRates[currency][c] == None:
 						continue
 					# Update the rates of the orders
 					self.currencyRates[currency][c].updateChain()
@@ -84,7 +84,7 @@ class stableCurrency(object):
 					orderList = []
 					for c in availableBalance:
 						# Ignore if None
-						if self.currencyRates[currency][c] == None:
+						if not self.currencyRates[currency].has_key(c) or self.currencyRates[currency][c] == None:
 							continue
 						# Clone the order
 						order = self.currencyRates[currency][c].clone()
