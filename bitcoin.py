@@ -97,14 +97,14 @@ if __name__ == "__main__":
 
 	# Disble simulation mode
 	# !! Warning !! This will deal with the real money
-	Exchange.disableSimulationMode()
+#	Exchange.disableSimulationMode()
 
 	# Validation function
 #	validation()
 #	exit()
 
 	#config = {'recordWrite': ("records/%s-%s-btce.txt" % (time.strftime("%Y.%m.%d"), time.strftime("%H.%M.%S")))}
-	#config = {'recordRead': "records/2015.02.03-10.40.02-btce.txt"}
+	#config = {'recordRead': "../bitcoin_arbitrage_records/2015.01.22-14.16.48-btce-+0.08%.txt"}
 	config = {}
 	config['apiKey'] = BTCE_APIKEY
 	config['apiSecret'] = BTCE_APISECRET

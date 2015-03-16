@@ -3,6 +3,7 @@
 
 from exchanges.port.btce import *
 from strategies.triangularArbitrage import *
+from strategies.stableCurrency import *
 from bot import *
 from privateConfig import *
 
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 
 	b = Bot({
 		'exchanges': [btce],
-		'algorithms': [triangularArbitrage],
+		'algorithms': [triangularArbitrage, stableCurrency],
 		'debug': False
 	})
 	b.run()

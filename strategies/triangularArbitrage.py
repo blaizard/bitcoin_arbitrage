@@ -107,27 +107,37 @@ class triangularArbitrage(object):
 			# Sort the opportunities to get the most profitable first
 			self.opportunityList[currency] = sorted(self.opportunityList[currency], key=lambda o: -o['gain'])
 
-	def process(self, currency, amount = 1.):
+	def process(self, amountList):
 		"""
 		Process the algorithm
 		"""
-		# Look if there are potential opportunities
-		for order in self.opportunityList[currency]:
-			# Get the first order, it must be the most profitable one
-			order = order['order']
-			order2 = order.cloneInverse()
-			# Calculates the minimal rate
-			order.getPair()
-			finalAmount = order.estimate(amount)
-			rate = (amount + order2.getTransaction().getFee(finalAmount)) / finalAmount
-			# Update the order and set the conditions
-			order2.setRate(rate)
-			order2.setConditions(rate, "minRate")
-			order2.setConditions(10000000, "timeout")
-			# Add this order to the queue
-			order.chain.append(order2)
-			# Execute the first order
-			return order
+
+		# Preprocess the pair to identify week pairs (if any)
+		self.preprocess()
+
+		# Loop through all available currencies
+		for currency in amountList:
+			# Get the amount
+			amount = amountList[currency]
+			# Look if there are potential opportunities
+			for order in self.opportunityList[currency]:
+				# Get the first order, it must be the most profitable one
+				order = order['order'].clone()
+				# Set the amount
+				order.setAmount(amount)
+				# Create the inverse order if the bid/ask price is reversing
+				order2 = order.cloneInverse()
+				# Calculates the minimal rate
+				finalAmount = order.estimate(amount)
+				rate = (amount + order2.getTransaction().getFee(finalAmount)) / finalAmount
+				# Update the order and set the conditions
+				order2.setRate(rate)
+				order2.setConditions(rate, "minRate")
+				order2.setConditions(10000000, "timeout")
+				# Add this order to the queue
+				order.chain.append(order2)
+				# Execute the first order
+				return [order]
 		return None
 
 	def createChainOrders(self, transactions):

@@ -16,14 +16,15 @@ class Bot(object):
 	ID = 0
 	# Default structure containing the different timings
 	time = []
-	# Defautl timestamp
+	# Default timestamp
 	initTimestamp = 0
 
 	def __init__(self, config = {}):
 		self.config = {
 			'simulationData': {
 				'balance': {
-					Currency.LTC: 100.
+					Currency.LTC: 100.,
+					Currency.BTC: 5.
 				}
 			},
 			'trade': {
@@ -273,6 +274,7 @@ class Bot(object):
 						ex['exchange'].updateOrders()
 					# Update the exchange pairs (rates)
 					timePairs = time.clock()
+					# Check if this is the last update available, this should only happens when
 					if ex['exchange'].updatePairs() == False:
 						UtilzLog.p("Final balance:", 1)
 						# Update the balance and print it one last time
@@ -281,21 +283,15 @@ class Bot(object):
 						exit()
 					timePairs = time.clock() - timePairs
 
-
-					# Pre-process the algorithms if needed
-					for algo in ex['algorithms']:
-						start = time.clock()
-						algo.preprocess()
-						timeAlgo.append(time.clock() - start)
-
-					# Run the algorhtms where there is money
+					# Build the list of amounts available for trading
+					# This depends on the minimal balance and recommanded amount
 					balance = ex['exchange'].getBalance()
+					amountList = {}
 					for currency in balance:
-						# Ignore is this curreny is not handled in the exchanged (this happens if a pair has stopped)
+						# Ignore if this curreny is not handled in the exchanged (this happens if a pair has stopped)
 						if currency not in ex['exchange'].currencyList():
 							continue
-
-						# Ignore if there isnot enough balance on this pair
+						# Ignore if there is not enough balance on this pair
 						if balance[currency] < self.tradeAmount[currency]['minBalance']:
 							continue
 						# Get the amount we want to trade
@@ -304,19 +300,20 @@ class Bot(object):
 						# If the amount left is bellow the minimal amount, use everything
 						if totalAmount <= amount + self.tradeAmount[currency]['minBalance']:
 							amount = totalAmount
+						amountList[currency] = amount
 
-						# Run the algorithms
-						for i, algo in enumerate(ex['algorithms']):
-							start = time.clock()
-							order = algo.process(currency, amount)
-							timeAlgo[i] = timeAlgo[i] + (time.clock() - start)
+					# Run the algorithm
+					for algo in ex['algorithms']:
 
-							# Check if there is an opportunity
-							if order != None:
-								# Execute the order
-								result = order.execute(amount = amount)
-								break
-						if order != None:
+						start = time.clock()
+						orderList = algo.process(amountList)
+						timeAlgo.append(time.clock() - start)
+
+						# Check if there is an opportunity
+						if orderList != None:
+							# Execute the orders
+							for order in orderList:
+								result = order.execute()
 							break
 
 				except Exception as e:
