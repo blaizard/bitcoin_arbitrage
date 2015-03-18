@@ -1,2 +1,65 @@
 Bug list:
 
+[2015-03-18 11:15:48,744] [display 1] - Bot Id: 1 (36:44:10)
+`BTC-e' Total execution time: 10.0ms (min:6.5ms; max:346.7ms)
+`BTC-e' Pair update execution time: 5.4ms (min:2.5ms; max:238.2ms)
+`BTC-e' Algorithm `triangularArbitrage' execution time: 4.4ms (min:3.7ms; max:159.8ms)
+`BTC-e' Algorithm `stableCurrency' execution time: 0.1ms (min:0.1ms; max:2.1ms)
+`BTC-e' at t=1426677347 - Total estimated value 101.804313 USD (-0.00%)
+PPC:    0.000000
+USD:    101.804310
+BTC:    0.000003
+LTC:    0.000003
+NVC:    0.000000
+NMC:    0.000000
+GBP:    0.000010
+RUR:    0.000570
+CNH:    0.000000
+EUR:    0.000007
+Active Orders: None
+[2015-03-18 11:15:49,914] [display 1] - Bot Id: 1 (36:44:11)
+`BTC-e' Total execution time: 8.7ms (min:6.5ms; max:346.7ms)
+`BTC-e' Pair update execution time: 4.2ms (min:2.5ms; max:238.2ms)
+`BTC-e' Algorithm `triangularArbitrage' execution time: 4.3ms (min:3.7ms; max:159.8ms)
+`BTC-e' Algorithm `stableCurrency' execution time: 0.1ms (min:0.1ms; max:2.1ms)
+`BTC-e' at t=1426677349 - Total estimated value 101.804313 USD (-0.00%)
+PPC:    0.000000
+USD:    101.804310
+BTC:    0.000003
+LTC:    0.000003
+NVC:    0.000000
+NMC:    0.000000
+GBP:    0.000010
+RUR:    0.000570
+CNH:    0.000000
+EUR:    0.000007
+Active Orders: None
+
+[2015-03-18 11:15:51,237] [opportunity 1] - (+0.65%) - 1.000000 USD -> 0.554444 LTC -> 0.667000 GBP -> 1.006500 USD
+[2015-03-18 11:15:51,243] [order 1] - [PENDING] [ID=366] t=`1426677351' <buy LTC/USD rate:0.555555 amount:10.0> -> <sell LTC/USD rate:1.805609 amount:10.0>
+[2015-03-18 11:15:51,243] [order 1] - `BTC-e' Trading `ltc_usd' `buy' rate:1.800001 amount:5.555550
+[2015-03-18 11:15:51,291] [display 1] - Bot Id: 1 (36:44:13)
+`BTC-e' Total execution time: 7.7ms (min:6.5ms; max:346.7ms)
+`BTC-e' Pair update execution time: 3.2ms (min:2.5ms; max:238.2ms)
+`BTC-e' Algorithm `triangularArbitrage' execution time: 4.3ms (min:3.7ms; max:159.8ms)
+`BTC-e' Algorithm `stableCurrency' execution time: 0.1ms (min:0.1ms; max:2.1ms)
+`BTC-e' at t=1426677351 - Total estimated value 101.804313 USD (-0.00%)
+PPC:    0.000000
+USD:    101.804310
+BTC:    0.000003
+LTC:    0.000003
+NVC:    0.000000
+NMC:    0.000000
+GBP:    0.000010
+RUR:    0.000570
+CNH:    0.000000
+EUR:    0.000007
+Active Orders:
+`BTC-e' id:366  pending         <buy LTC/USD rate:0.555555 amount:10.0>
+
+Traceback (most recent call last):
+  File "bitcoin_arbitrage/computeengine.py", line 44, in <module>
+    b.run()
+  File "/home/blaise_lengrand_gmail_com/bitcoin_arbitrage/bot.py", line 332, in run
+    t['min'] = min(t['min'], timeAlgo[i])
+IndexError: list index out of range

@@ -31,9 +31,9 @@ class Bot(object):
 				# The reference currency
 				'currency': Currency.USD,
 				# Amount to use for a transaction
-				'amount': 10.,
+				'amount': 30.,
 				# Any amount below this balance will not be traded
-				'minBalance': 2.
+				'minBalance': 1.
 			},
 			'exchanges': [],
 			'algorithms': [],
@@ -246,7 +246,7 @@ class Bot(object):
 
 				# If this is the first time
 				if len(self.time) == 0:
-					self.time.append({
+					timings = {
 						'algorithms': [],
 						'updatePairs': {
 							'min': sys.maxint,
@@ -258,7 +258,15 @@ class Bot(object):
 							'max': 0.,
 							'current': 0.
 						}
-					})
+					}
+					for algo in ex['algorithms']:
+						timings['algorithms'].append({
+							'min': sys.maxint,
+							'max': 0.,
+							'current': 0.
+						})
+					self.time.append(timings)
+
 				# Variable to generate the algorithm timings
 				timeAlgo = []
 				timeLoop = time.clock()
@@ -322,24 +330,20 @@ class Bot(object):
 						raise
 					continue
 
-				# Calculate the loop time
+				# Calculate the total loop time
 				timeLoop = time.clock() - timeLoop
 
 				# Update the timings
 				for i, algo in enumerate(ex['algorithms']):
-					if len(self.time[iEx]['algorithms']) > i:
-						t = self.time[iEx]['algorithms'][i]
-						t['min'] = min(t['min'], timeAlgo[i])
-						t['max'] = max(t['max'], timeAlgo[i])
-						t['current'] = timeAlgo[i]
-						self.time[iEx]['algorithms'][i] = t
-					else:
-						t = {
-							'min': timeAlgo[i],
-							'max': timeAlgo[i],
-							'current': timeAlgo[i]
-						}
-						self.time[iEx]['algorithms'].append(t)
+					# Make sure this algorithm has been measured
+					if i >= len(timeAlgo):
+						break
+					t = self.time[iEx]['algorithms'][i]
+					t['min'] = min(t['min'], timeAlgo[i])
+					t['max'] = max(t['max'], timeAlgo[i])
+					t['current'] = timeAlgo[i]
+					self.time[iEx]['algorithms'][i] = t
+
 				# Update the full loop timings
 				self.time[iEx]['loop']['min'] = min(self.time[iEx]['loop']['min'], timeLoop)
 				self.time[iEx]['loop']['max'] = max(self.time[iEx]['loop']['max'], timeLoop)
