@@ -64,7 +64,7 @@ class Order(object):
 		defaultConditions = {
 			'minTimestamp': -1,
 			'maxTimestamp': sys.maxint,
-			# Infinte timeout, if none zero, it will overwrite 'maxTimestamp'
+			# Infinte timeout, if none -1, it will overwrite 'maxTimestamp'
 			'timeout': -1,
 			'minRate': -1,
 			'maxRate': sys.maxint
@@ -111,7 +111,23 @@ class Order(object):
 		"""
 		Print the current order
 		"""
-		return "<%s %s/%s rate:%s amount:%s>" % (str(self.transactionType), str(self.pair.getBaseCurrency()), str(self.pair.getQuoteCurrency()), str(self.rate), str(self.amount))
+		conditions = ""
+		# Describes conditions if any
+		if self.status == Order.STATUS_IDLE or self.status == Order.STATUS_PENDING:
+			conditionsList = []
+			if self.conditions['minTimestamp'] != -1:
+				conditionsList.append("minTimestamp=%i" % (self.conditions['minTimestamp']))
+			if self.conditions['maxTimestamp'] != sys.maxint:
+				conditionsList.append("maxTimestamp=%i" % (self.conditions['maxTimestamp']))
+			if self.conditions['timeout'] != -1:
+				conditionsList.append("timeout=%i" % (self.conditions['timeout']))
+			if self.conditions['minRate'] != -1:
+				conditionsList.append("minRate=%f" % (self.conditions['minRate']))
+			if self.conditions['maxRate'] != sys.maxint:
+				conditionsList.append("maxRate=%f" % (self.conditions['maxRate']))
+			conditions = " condition(s):%s" % (";".join(conditionsList))
+
+		return "<%s %s/%s rate:%s amount:%s%s>" % (str(self.transactionType), str(self.pair.getBaseCurrency()), str(self.pair.getQuoteCurrency()), str(self.rate), str(self.amount), conditions)
 
 	def printEstimate(self, amount = 1.):
 		"""
