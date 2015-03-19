@@ -37,6 +37,7 @@ class Order(object):
 	# Order statuses
 	STATUS_IDLE = "idle"
 	STATUS_PENDING = "pending"
+	STATUS_PLACED = "placed"
 	STATUS_EFFECTIVE = "effective"
 	STATUS_COMPLETED = "completed"
 	STATUS_CANCELED = "canceled"
@@ -97,6 +98,14 @@ class Order(object):
 		Active orders are otherders that are processing.
 		"""
 		return Order.activeList
+
+	@staticmethod
+	def getPlacedList():
+		"""
+		Returns the list of placed orders.
+		it can be either placed orders, effective orders or completed orders.
+		"""
+		return [o for o in Order.activeList if o.getStatus() == STATUS_PLACED or o.getStatus() == STATUS_EFFECTIVE  or o.getStatus() == STATUS_COMPLETED]
 
 	def printOrder(self):
 		"""
@@ -418,7 +427,7 @@ class Order(object):
 		"""
 		Execute an order.
 		Here is the lifetime of an order:
-		Execute -> Pending -> Effective -> Completed
+		Execute -> Pending -> Placed -> Effective -> Completed
 		"""
 		# Get the order info
 		info = self.getInfo(amount)
@@ -484,6 +493,12 @@ class Order(object):
 				# Cancel the order
 				self.setStatus(Order.STATUS_CANCELED, matchConditions[1])
 				return
+
+			# Place the order
+			self.setStatus(Order.STATUS_PLACED)
+
+		elif info['status'] == Order.STATUS_PLACED:
+			UtilzLog.order("[PLACED] [ID=%i] t=`%s' %s" % (self.getId(), str(info['pair'].getTimestamp()), str(self)))
 
 			# Identify the exchange
 			exchange = info['pair'].getExchange()

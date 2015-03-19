@@ -108,7 +108,7 @@ class stableCurrency(object):
 				return None
 
 			# Check the status of the orders, make sure none are pending
-			if len(Order.getActiveList()) == 0:
+			if len(Order.getPlacedList()) == 0:
 				self.state = "idle"
 				# Update the initial balances
 				self.updateInitialBalance()

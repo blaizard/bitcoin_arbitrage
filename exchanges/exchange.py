@@ -90,14 +90,14 @@ class Exchange(object):
 		balance = self.getBalance()
 		currencyList = self.currencyList()
 		stringList = []
-		balancePending = self.getPendingBalance()
+		balancePlaced = self.getPlacedBalance()
 		for currency in currencyList:
 			amount = 0.
 			if balance.has_key(currency):
 				amount = balance[currency]
 			string = "%s:\t%f" % (currency, amount)
-			if balancePending.has_key(currency):
-				string = "%s\t(+%f)" % (string, balancePending[currency])
+			if balancePlaced.has_key(currency):
+				string = "%s\t(+%f)" % (string, balancePlaced[currency])
 			stringList.append(string)
 		return "\n".join(stringList)
 
@@ -269,7 +269,7 @@ class Exchange(object):
 				time = timestamp - o['timestamp']
 
 				# Get through the state machine
-				if order.getStatus() == Order.STATUS_PENDING:
+				if order.getStatus() == Order.STATUS_PLACED:
 					# Check if it is considered effective
 					if time >= o['transaction'].getTimeEffective():
 						# Get the order info
@@ -307,7 +307,7 @@ class Exchange(object):
 							self.orderCompleted(identifier)
 						elif activeOrders[identifier]['status'] == Order.STATUS_EFFECTIVE:
 							self.orderEffective(identifier)
-						elif activeOrders[identifier]['status'] == Order.STATUS_PENDING:
+						elif activeOrders[identifier]['status'] == Order.STATUS_PLACED:
 							pass # Do nothing, keep monitoring
 						else:
 							raise error("Unknown order status `%s'" % (str(activeOrders[identifier])))
@@ -315,8 +315,8 @@ class Exchange(object):
 						del activeOrders[identifier]
 					# If this order is not part of the active list
 					else:
-						# If is currently in pending state, set it to completed
-						if o['order'].getStatus() == Order.STATUS_PENDING:
+						# If is currently in placed state, set it to completed
+						if o['order'].getStatus() == Order.STATUS_PLACED:
 							self.orderCompleted(identifier)
 
 				# If there are order that are not known, create and add them
@@ -327,8 +327,8 @@ class Exchange(object):
 					pair = self.getPair(activeOrders[identifier]["pair"][0], activeOrders[identifier]["pair"][1])
 					# Create the order
 					order = self.createOrder(pair, activeOrders[identifier]["type"], activeOrders[identifier]["rate"], activeOrders[identifier]["amount"])
-					# Force the pending status
-					order.status = Order.STATUS_PENDING
+					# Force the placed status
+					order.status = Order.STATUS_PLACED
 					# Make this order active
 					order.active()
 					# Watch this order from now on
@@ -336,7 +336,7 @@ class Exchange(object):
 
 	def updateOrdersPort(self):
 		"""
-		This funciton update the status of the pending orders
+		This funciton update the status of the placed orders
 		"""
 		raise error("The `updateOrdersPort' function must be implemented.")
 
@@ -433,7 +433,7 @@ class Exchange(object):
 			return self.context['balance'][currency]
 		return 0.
 
-	def getPendingBalance(self, currency = None):
+	def getPlacedBalance(self, currency = None):
 		"""
 		Return the money in transition, money currenlty frozen for the transaction
 		If currency is set, returns the balance of this specific currency
@@ -459,14 +459,14 @@ class Exchange(object):
 		"""
 		if currency == None:
 			balance = self.getBalance()
-			balancePending = self.getPendingBalance()
+			balancePlaced = self.getPlacedBalance()
 			for c in balance:
-				if balancePending.has_key(c):
-					balancePending[c] = balancePending[c] + balance[c]
+				if balancePlaced.has_key(c):
+					balancePlaced[c] = balancePlaced[c] + balance[c]
 				else:
-					balancePending[c] = balance[c]
-			return balancePending
-		return self.getBalance(currency) + self.getPendingBalance(currency)
+					balancePlaced[c] = balance[c]
+			return balancePlaced
+		return self.getBalance(currency) + self.getPlacedBalance(currency)
 
 	def getOrders(self):
 		"""

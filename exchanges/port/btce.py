@@ -293,7 +293,7 @@ class ExchangeBTCE(Exchange):
 		orderList = {}
 		for identifier in activeOrders:
 			# Check the status
-			status = Order.STATUS_PENDING
+			status = Order.STATUS_PLACED
 			if activeOrders[identifier]["status"] == 1:
 				status = Order.STATUS_COMPLETED
 			orderList[identifier] = {
